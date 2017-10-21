@@ -1,0 +1,493 @@
+'------------------------------------------------------------------------------------------------------------------------------'
+'------------------------------------------------------------------------------------------------------------------------------'
+'------------------------------------------------------------------------------------------------------------------------------'
+' Create Top Boxes
+' Written By: 	Kristin Carter
+' Description: 	This script reads in a .sav file and creates metadata (shell) for Top & Top 2 Box summary variables. 
+'				It outputs a .MDD file and a .txt file that includes code to run in the Create MDD DMS script.
+'------------------------------------------------------------------------------------------------------------------------------'
+'------------------------------------------------------------------------------------------------------------------------------'
+'------------------------------------------------------------------------------------------------------------------------------'
+
+'Change the Project Name and Path for Each Study
+#define Project "Kylie"
+#define myPath "K:\Life of Kylie Brand Study\Field and Tabs\Wave 1\"
+		
+
+'Declare Variables
+Dim TableDoc
+Dim MDM, fso, txtfile, f, fso2, fixbases
+Dim DSC, DSCs
+Dim Samp, k, C, Terr
+
+'For Loop: Loop through countries (If Only 1 country, say for C = 1 to 1)
+for C = 1 to 1
+
+	'For Loop: Loop	through samples (If Only 1 sample, say for k = 1 to 1)
+	for k = 1 to 1
+
+		'Assign Samp Values
+		if k = 1 then Samp = "GenPar"
+		if k = 2 then Samp = "Kids"		
+		
+		'Assign Terr Values
+		if C = 1 then Terr = "All Countries"
+		if C = 2 then Terr = "All Countries Screener"
+
+		
+		
+		'Create the Text File that will have Code for Creating Top Box Variables in the DMS
+		Set fso = CreateObject("Scripting.FileSystemObject")
+		Set txtfile = fso.CreateTextFile("On Next Case " + Samp + ".txt" , True, True)		
+		
+		'This creates a text file with syntax to fix bases for summary variables
+		Set fso2 = CreateObject("Scripting.FileSystemObject")
+		Set fixbases = fso2.CreateTextFile("FixBases " + Samp + ".txt" , True, True)
+		
+		'The .SAV to Read in - Will need to make sure Filename Matches exactly (i.e. Big Hero 6 Recoded UK GenPar.sav)
+		#define INPUTSAV myPath + "Data\" + Project + " " + Samp + " " + Terr +  ".sav"
+		
+		'The Output MDD files
+		#define OUTPUTMDD myPath + "Tabs\Tab Prep\" + Project + " " + Samp + " " + Terr +  ".mdd"		
+		
+		'A Temp file that gets deleted
+		#define TEMPMDD myPath + "Tabs\Tab Prep\DataTemp" + Samp + ".mdd"
+		
+		'This Chunk of code just Reads the .SAV and saves it as an MDD
+		if fso.FileExists (OUTPUTMDD) Then fso.DeleteFile(OUTPUTMDD)
+		Set DSCs = CreateObject("MRDSCReg.Components")
+		Set DSC = DSCs["mrSavDsc"]
+		Set MDM = DSC.Metadata.Open(INPUTSAV)
+		MDM.Save(OUTPUTMDD)
+		MDM.Close()	
+			
+		' Create a new Document object
+		Set TableDoc = CreateObject("TOM.Document")
+		
+		' Load the dataset
+		With TableDoc.DataSet
+		     .Load(OUTPUTMDD, , INPUTSAV, "mrSavDsc",)
+		    .View = 1 ' HDATA
+		End With
+			
+		'Makes the Data Read-Write instead of Read Only	
+		Set f = fso.GetFile(OUTPUTMDD)
+		If f.Attributes.BitAnd(1) Then
+		    f.Attributes = f.Attributes - 1
+		End If
+		
+'------------------------------------------------------------------------------------------------------------------------------'
+'------------------------------------------------------------------------------------------------------------------------------'
+'------------------------------------------------------------------------------------------------------------------------------'		
+		'Each NewGrid() line creates a grid that will later be used to create the Summary Variables (Top Box Variables)
+		'You need to Change the Variable Name, Top of Grid Label, and Side of Grid Label
+		'The Top & Side Labels aren't as important as the Variable Name if you are not showing the actual Grid in the tabs
+		'You need a grid for either scaled statement questions, or Multiple Response Descriptions asked by Brand
+		'The number of variables is automatically read based on the variable name, so you need to be sure they are named correctly in the SAV data
+'------------------------------------------------------------------------------------------------------------------------------'
+'------------------------------------------------------------------------------------------------------------------------------'
+'------------------------------------------------------------------------------------------------------------------------------'			
+		
+		'TableDoc.DataSet.Variables.AddNewGrid("CrackleF1,CrackleF2,CrackleF3,CrackleF4,CrackleF5,CrackleF6,CrackleF7,HuluF1,HuluF2,HuluF3,HuluF4,HuluF5,AmazonF1,AmazonF2,AmazonF3,AmazonF4,AmazonF5,AmazonF6,AmazonF7,NetflixF1,NetflixF2,NetflixF3,NetflixF4,NetflixF5,NetflixF6,NetflixF7,NetflixF8,NetflixF9,NetflixF10,NetflixF11,NetflixF12,NetflixF13,NetflixF14,NetflixF15", "ShowFit", "Show", "How well do you think this fits with...?")
+		
+		
+		'All Samples Completes & Screener
+
+
+	
+			
+		'All Samples, Completes Only
+			
+		if C = 1 then
+NewGrid(TableDoc, fixbases, "Rac1", "Grid Top", "Grid Side")
+NewGrid(TableDoc, fixbases, "NetView", "Grid Top", "Grid Side")
+NewGrid(TableDoc, fixbases, "ShowTimes", "Grid Top", "Grid Side")
+NewGrid(TableDoc, fixbases, "CelebFollow", "Grid Top", "Grid Side")
+NewGrid(TableDoc, fixbases, "LOKDigital", "Grid Top", "Grid Side")
+NewGrid(TableDoc, fixbases, "Subscriptions", "Grid Top", "Grid Side")
+NewGrid(TableDoc, fixbases, "SocialPlatUsage", "Grid Top", "Grid Side")
+NewGrid(TableDoc, fixbases, "SnapBrands", "Grid Top", "Grid Side")
+NewGrid(TableDoc, fixbases, "KylieSocialAffinity", "Grid Top", "Grid Side")
+NewGrid(TableDoc, fixbases, "Expectations", "Grid Top", "Grid Side")
+NewGrid(TableDoc, fixbases, "BeforeAfter", "Grid Top", "Grid Side")
+NewGrid(TableDoc, fixbases, "ForcedWhyNever", "Grid Top", "Grid Side")
+NewGrid(TableDoc, fixbases, "ForcedWhyNotMore", "Grid Top", "Grid Side")
+NewGrid(TableDoc, fixbases, "SiteVisitation", "Grid Top", "Grid Side")
+NewGrid(TableDoc, fixbases, "Segmentation", "Grid Top", "Grid Side")
+
+		end if
+		
+		
+		'GenPar Completes & Screener
+		if k = 1 then
+
+		end if
+		
+		'GenPar Completes Only
+		if C = 1 and K = 1 then				
+
+		end if
+		
+		'Kids Completes & Screener
+		if k = 2 then 			
+		
+		end if	
+		
+		'Saves and Closes the MDD
+		TableDoc.Dataset.MdmDocument.Save(TEMPMDD)
+		TableDoc.DataSet.MdmDocument.Close()
+		
+		'Opens MDD to Create the Top Box Shells
+		Set MDM = CreateObject("MDM.Document")		
+		MDM.Open(TEMPMDD)
+		
+	
+'------------------------------------------------------------------------------------------------------------------------------'
+'------------------------------------------------------------------------------------------------------------------------------'
+'------------------------------------------------------------------------------------------------------------------------------'		
+		'Each CreateTopBox() line creates a shell for the Summary Variable
+		'You need to change the Variable Name you are creating, and the type of variable (ie Top Box, or Top 2 Box, Bottom 2 Box
+		'The options are Top Box, Top 2 Box, Top 3 Box, By Box, Bottom 2 Box, Bottom 3 Box, Bottom Box
+'------------------------------------------------------------------------------------------------------------------------------'
+'------------------------------------------------------------------------------------------------------------------------------'
+'------------------------------------------------------------------------------------------------------------------------------'			
+ 		 
+ 		
+	'All Samples Completes & Screener	
+
+	 
+		 
+	'All Samples, Completes Only
+		if C = 1 then
+CreateTopBox(MDM, txtfile, "Rac1", "By Box")
+CreateTopBox(MDM, txtfile, "NetView", "By Box")
+CreateTopBox(MDM, txtfile, "ShowTimes", "By Box")
+CreateTopBox(MDM, txtfile, "CelebFollow", "By Box")
+CreateTopBox(MDM, txtfile, "LOKDigital", "By Box")
+CreateTopBox(MDM, txtfile, "Subscriptions", "By Box")
+CreateTopBox(MDM, txtfile, "SocialPlatUsage", "By Box")
+CreateTopBox(MDM, txtfile, "SnapBrands", "By Box")
+CreateTopBox(MDM, txtfile, "KylieSocialAffinity", "By Box")
+CreateTopBox(MDM, txtfile, "Expectations", "By Box")
+CreateTopBox(MDM, txtfile, "BeforeAfter", "By Box")
+CreateTopBox(MDM, txtfile, "ForcedWhyNever", "By Box")
+CreateTopBox(MDM, txtfile, "ForcedWhyNotMore", "By Box")
+CreateTopBox(MDM, txtfile, "SiteVisitation", "By Box")
+CreateTopBox(MDM, txtfile, "Segmentation", "By Box")
+
+CreateTopBox(MDM, txtfile, "KylieSocialAffinity", "Top 2 Box")
+CreateTopBox(MDM, txtfile, "Expectations", "Top 2 Box")
+CreateTopBox(MDM, txtfile, "Segmentation", "Top 2 Box")
+
+CreateTopBox(MDM, txtfile, "KylieSocialAffinity", "Bottom 2 Box")
+CreateTopBox(MDM, txtfile, "Expectations", "Bottom 2 Box")
+CreateTopBox(MDM, txtfile, "Segmentation", "Bottom 2 Box")
+
+			 
+			 '(MDM, txtfile, Name, Label, Grid, Type, Box)
+			 
+		 
+'------------------------------------------------------------------------------------------------------------------------------'
+'------------------------------------------------------------------------------------------------------------------------------'
+'------------------------------------------------------------------------------------------------------------------------------'		
+		'If it's not a standard summary variable like Top Box, (i.e. box 3 & 4 of a 5-cat variable, you need to use this one
+		'You need to change the Variable Name you are creating, The label for the summary variable, and the box number(s) to summarize
+'------------------------------------------------------------------------------------------------------------------------------'
+'------------------------------------------------------------------------------------------------------------------------------'
+'------------------------------------------------------------------------------------------------------------------------------'			 
+			 
+			 							 'Var Name      	'Var Name Appendix	'Label          					'Box Numbers to Summarize 
+'			 CreateCustBox(MDM, txtfile, "ElemRate",		"_B3B",				"%Good, Fair, Poor", 				{3, 4, 5})
+'			 CreateCustBox(MDM, txtfile, "MusicEnjoy",		"_B2B",				"%Did not like much or at all", 	{3, 4})
+'			 CreateCustBox(MDM, txtfile, "MusicGenEnjoy",	"_B2B",				"%Did not like much or at all", 	{3, 4})
+		
+			 
+			 
+'			 CreateTopBox_Old(MDM, txtfile, "ElemRate_B3B",			"%Good, Fair or Poor", 							"ElemRate", 	"Bot 2", 4)
+'			 CreateTopBox_Old(MDM, txtfile, "MusicEnjoy_B2B",		"%Did not like much or Did not like at all", 	"MusicEnjoy", 	"Bot 2", 3)
+'			 CreateTopBox_Old(MDM, txtfile, "MusicGenEnjoy_B2B",	"%Did not like much or Did not like at all", 	"MusicGenEnjoy","Bot 2", 3)
+	
+			 
+		end if
+		
+	'GenPar Completes & Screener
+		if k = 1 then
+			
+		
+		 	'GenPar Completes Only
+			if C = 1 then				
+			
+
+		
+				
+			end if				
+			
+		end if		
+		
+		'Kids Completes & Screener
+		if k = 2 then
+			'Kids Completes Only
+			if C = 1 then	
+			end if			
+		end if	
+		
+		txtfile.Close()
+		fixbases.Close()
+		MDM.Save(OUTPUTMDD)
+		MDM.Close()
+		
+		fso.DeleteFile(TEMPMDD)
+	next
+next
+
+Set MDM = CreateObject("MDM.Document")
+
+''' THESE ARE SUB ROUTINES THAT YOU DO NOT NEED TO CHANGE
+
+
+Sub CreateTopBox(MDM, txtfile, Name, Type)
+	Dim MyVariable, cat, cats, cnt, NameNew, Grid, ECount, LType, Label, elem
+	
+	Grid = Name
+	ECount = MDM.Fields[Grid].Fields["Column"].Categories.Count
+	
+	
+	Select Case Type
+	
+	
+		
+	Case "By Box"
+		cnt = 0
+		for each cat in MDM.Fields[Grid].Fields["Column"].Categories
+			if cnt = 0 then NameNew = Name + "_TB"
+			if cnt > 0 then NameNew = Name + "_" + makestring(cnt+1) + "B"
+			
+			Label = "%" + MDM.Fields[Grid].Fields["Column"].Categories[cnt].Label
+			
+			Set MyVariable = MDM.CreateVariable(NameNew, Label)
+		    MyVariable.MinValue = 1
+		    MyVariable.DataType = mr.Categorical
+			
+			For Each elem In MDM.Fields[Grid].Elements
+				MyVariable.Elements.Add(MDM.CreateElement(elem.Name, elem.Label))
+			Next
+			    
+			MDM.Fields.Add(MyVariable)
+			
+			txtfile.WriteLine("    ' " + Name)		
+			'cats = Left(cats,Len(cats)-1)	
+			txtfile.WriteLine("    CreateGridSummary(" + Grid + ", " + NameNew + ", {" + cat + "}, ""Column"")")	
+			txtfile.WriteLine("")
+			cnt = cnt + 1
+		next
+	
+	Case "Top Box"
+		NameNew = Name + "_TB"
+		Label = "%" + MDM.Fields[Grid].Fields["Column"].Categories[0].Label
+		cats = cats + MDM.Fields[Grid].Fields["Column"].Categories[0].Name + ","
+		
+	Case "Top 2 Box" 
+		NameNew = Name + "_T2B"
+		Label = "%" + MDM.Fields[Grid].Fields["Column"].Categories[0].Label + " or " +  MDM.Fields[Grid].Fields["Column"].Categories[1].Label
+		For cnt = 0 To 1
+			cats = cats + MDM.Fields[Grid].Fields["Column"].Categories[cnt].Name + ","
+		Next
+		
+	Case "Top 3 Box" 
+		NameNew = Name + "_T3B"
+		Label = "%" + MDM.Fields[Grid].Fields["Column"].Categories[0].Label + " or " +  MDM.Fields[Grid].Fields["Column"].Categories[1].Label + " or " +  MDM.Fields[Grid].Fields["Column"].Categories[2].Label
+		For cnt = 0 To 2
+			cats = cats + MDM.Fields[Grid].Fields["Column"].Categories[cnt].Name + ","
+		Next
+		
+	Case "Bottom 2 Box" 
+		NameNew = Name + "_B2B"		
+		Label = "%" + MDM.Fields[Grid].Fields["Column"].Categories[ECount-1].Label + " or " +  MDM.Fields[Grid].Fields["Column"].Categories[ECount-2].Label
+		For cnt = ECount - 2 To ECount - 1
+			cats = cats + MDM.Fields[Grid].Fields["Column"].Categories[cnt].Name + ","
+		Next
+		
+	Case "Bottom 3 Box" 
+		NameNew = Name + "_B3B"
+		Label = "%" + MDM.Fields[Grid].Fields["Column"].Categories[ECount-1].Label + ", " +  MDM.Fields[Grid].Fields["Column"].Categories[ECount-2].Label+ " or " +  MDM.Fields[Grid].Fields["Column"].Categories[ECount-3].Label
+		For cnt = ECount - 3 To ECount - 1
+			cats = cats + MDM.Fields[Grid].Fields["Column"].Categories[cnt].Name + ","
+		Next
+		
+	Case "Bottom Box" 
+		NameNew = Name + "_BB"
+		Label = "%" + MDM.Fields[Grid].Fields["Column"].Categories[ECount-1].Label
+		cats = cats + MDM.Fields[Grid].Fields["Column"].Categories[ECount-1].Name + ","
+	
+	End Select
+	
+	if Type <> "By Box" then
+		
+		Set MyVariable = MDM.CreateVariable(NameNew, Label)
+	    MyVariable.MinValue = 1
+	    MyVariable.DataType = mr.Categorical
+		
+		For Each cat In MDM.Fields[Grid].Elements
+			MyVariable.Elements.Add(MDM.CreateElement(cat.Name, cat.Label))
+		Next
+		    
+		MDM.Fields.Add(MyVariable)
+		
+		txtfile.WriteLine("    ' " + Name)		
+		cats = Left(cats,Len(cats)-1)	
+		txtfile.WriteLine("    CreateGridSummary(" + Grid + ", " + NameNew + ", {" + cats + "}, ""Column"")")	
+		txtfile.WriteLine("")
+		
+	end If	
+
+End Sub
+
+
+' CreateCustBox(MDM, txtfile, "ElemRate",		"_B3B"				"Bottom 3 Box", 	"3, 4, 5")
+
+Sub CreateCustBox(MDM, txtfile, Name, Name2, NewLabel, BoxNums)
+	Dim MyVariable, cat, cats, cnt, NameNew, Grid, ECount, LType, Label, elem, SummaryBoxes, NumElem
+	
+	Grid = Name
+	NameNew = Name + Name2
+	'SummaryBoxes = split(BoxNums, ",")
+	NumElem=len(BoxNums)
+				
+	if NumElem = 1 then 
+		Label = "%" + MDM.Fields[Grid].Fields["Column"].Categories[BoxNums[0]-1].Label
+		cats = MDM.Fields[Grid].Fields["Column"].Categories[BoxNums[0]-1].Name
+	end if
+	
+	if NumElem > 1 then 
+		Label = "%" + MDM.Fields[Grid].Fields["Column"].Categories[BoxNums[0]-1].Label
+		cats = MDM.Fields[Grid].Fields["Column"].Categories[BoxNums[0]-1].Name
+		for cnt = BoxNums[1] to BoxNums[NumElem-1]
+			Label = Label + " or " + MDM.Fields[Grid].Fields["Column"].Categories[cnt-1].Label
+			cats = cats + "," + MDM.Fields[Grid].Fields["Column"].Categories[cnt-1].Name
+		next	
+		
+	end if
+	
+
+	
+	Set MyVariable = MDM.CreateVariable(NameNew, Label)
+    MyVariable.MinValue = 1
+    MyVariable.DataType = mr.Categorical
+	
+	For Each cat In MDM.Fields[Grid].Elements
+		MyVariable.Elements.Add(MDM.CreateElement(cat.Name, cat.Label))
+	Next
+	    
+	MDM.Fields.Add(MyVariable)
+	
+	txtfile.WriteLine("    ' " + Name)		
+	txtfile.WriteLine("    CreateGridSummary(" + Grid + ", " + NameNew + ", {" + cats + "}, ""Column"")")	
+	txtfile.WriteLine("")
+	
+	
+
+End Sub
+
+Sub NewGrid(TableDoc, fixbases, Name, Label, CLabel)
+
+	Dim i, VarList, k, NumNew, VarSpl, NameLen, Counter, VarLen, Suffix, StreamL
+	k = 1	
+	NameLen = Len(Name)
+	Counter = 0
+	StreamL = ""	
+	
+	For each VarSpl in TableDoc.DataSet.Variables
+	
+		if Ucase(Left(VarSpl.Name, NameLen)) = UCase(Name) then 
+			VarLen = Len(VarSpl.Name)
+			
+			Suffix = Mid(VarSpl.Name, NameLen, VarLen)
+			
+			if Validate(Suffix, , , "\d") = TRUE or Validate(Suffix, , , "\d{2}") or Validate(Suffix, , , "\d{3}")= TRUE then
+				if Counter = 0 then VarList = Name + makestring(Suffix)
+				if Counter > 0 then VarList = VarList + "," + Name + makestring(Suffix)	
+				StreamL = StreamL + ", b" + makestring(Suffix) + "'Base' base('" + Name + makestring(Suffix) + " is not null') [isHidden=TRUE], " + Name + makestring(Suffix)		
+				Counter = Counter + 1	
+				
+			End If	
+			 
+		end if	
+	
+	next		
+	
+'	NumNew = Counter
+'	StreamL = ""	
+'	for i = k to NumNew
+'	
+'		if i = k then VarList = Name + makestring(i)
+'		if i > k then VarList = VarList + "," + Name + makestring(i)	
+'		
+'		StreamL = StreamL + ", b" + makestring(i) + "'Base' base('" + Name + makestring(i) + " is not null') [isHidden=TRUE], " + Name + makestring(i)		
+'	next
+	
+	TableDoc.DataSet.Variables.AddNewGrid(VarList, _
+											Name, _
+											Label, _
+											CLabel)   
+    
+    fixbases.WriteLine(Name + "_TB categorical axis(""{base() [IsHidden=TRUE]" + StreamL + "}"");")	
+	fixbases.WriteLine("")
+	
+
+End Sub
+
+Sub CreateTopBox_Old(MDM, txtfile, Name, Label, Grid, Type, Box)
+	Dim MyVariable
+	Dim cat, cats, cnt, BoxG
+	
+	Set MyVariable = MDM.CreateVariable(Name, Label)
+    MyVariable.MinValue = 1
+    MyVariable.DataType = mr.Categorical
+	
+	For Each cat In MDM.Fields[Grid].Elements
+		MyVariable.Elements.Add(MDM.CreateElement(cat.Name, cat.Label))
+	Next
+	    
+	MDM.Fields.Add(MyVariable)
+	
+	txtfile.WriteLine("    ' " + Name)	
+	if Type = "Top 2" then
+		For cnt = 0 To Box - 1
+			cats = cats + MDM.Fields[Grid].Fields["Column"].Categories[cnt].Name + ","
+		Next
+	end if
+	if Type = "Bot 2" then
+		BoxG = MDM.Fields[Grid].Fields["Column"].Categories.Count
+		For cnt = BoxG-Box To BoxG-2
+			cats = cats + MDM.Fields[Grid].Fields["Column"].Categories[cnt].Name + ","
+		Next
+	end if
+	if Type = "Single" then		
+		cats = cats + MDM.Fields[Grid].Fields["Column"].Categories[Box-1].Name + ","		
+	end if
+	
+	cats = Left(cats,Len(cats)-1)	
+	txtfile.WriteLine("    CreateGridSummary(" + Grid + ", " + Name + ", {" + cats + "}, ""Column"")")	
+	txtfile.WriteLine("")
+
+End Sub
+
+
+Sub NewGrid_Old(TableDoc, Name, Label, Num, CLabel)
+
+	Dim i, VarList, k
+	k = 1
+		
+	for i = k to Num
+	
+		if i = k then VarList = Name + makestring(i)
+		if i > k then VarList = VarList + "," + Name + makestring(i)		
+		
+	next
+	
+	TableDoc.DataSet.Variables.AddNewGrid(VarList, _
+											Name, _
+											Label, _
+											CLabel)
+
+End Sub
