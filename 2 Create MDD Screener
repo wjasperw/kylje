@@ -1,0 +1,378 @@
+'-----------------------------------------------------
+'Change the Project Name and Path for Each Study
+'-----------------------------------------------------
+#define Project "Kylie"
+#define myPath "K:\Life of Kylie Brand Study\Field and Tabs\Wave 1\"
+
+
+'#define Country "All Countries"
+#define Country "US"
+#define Samp 	"Gen"
+
+'-----------------------------------------------------
+'Define Input & Output Datasets
+'-----------------------------------------------------
+
+#define InputSAV myPath + "Data\" + Project + " " + Samp + " " + Country +  " Screener.sav"
+#define InputMDD myPath + "Tabs\Tab Prep\" + Project + " " + Samp + " " + Country +  " Screener.mdd"
+#define TargetDDF myPath + "Tabs\Tab Prep\Data1 " + Country + " Screener.DDF"
+#define TargetMdd myPath + "Tabs\Tab Prep\Data1 " + Country + " Screener.MDD"
+
+
+'-----------------------------------------------------
+'Delete Output Data if Already Exists
+'-----------------------------------------------------
+Event(onbeforejobstart, "")
+	Dim fso
+	Set fso = createobject("Scripting.Filesystemobject")	
+	if fso.FileExists (TargetMdd) Then
+		fso.DeleteFile(TargetMdd)
+	end if
+	if fso.FileExists (TargetDDF) Then
+		fso.DeleteFile(TargetDDF)
+	end if
+	
+	
+	Dim MDM
+
+   ' Create the MDM object 
+   Set MDM = CreateObject("MDM.Document") 
+   ' Open all versions of the Short Drinks sample
+   MDM.Open(InputMDD)
+
+   ' Set up axis expressions for all numeric variables
+   ' that don't already have one
+   CreateAxisExpressions(MDM.Fields)
+
+   Sub CreateAxisExpressions(Fields)
+      Dim Field
+
+      ' Loop through all fields and create an axis expression for 
+      ' all of the numeric variables that don't already have one
+      For Each Field In Fields
+         Select Case Field.ObjectTypeValue
+            Case ObjectTypesConstants.mtVariable   ' Simple variable
+               If Field.DataType = mr.Long Or Field.DataType = mr.Double Then
+                  ' It's a numeric
+                  If Field.Name <> "Overall" then
+	                  If Field.AxisExpression.IsEmpty() Then
+	                     ' It hasn't already got an axis expression, so create one
+	                     Field.AxisExpression = "{min 'Minimum' min(" + Field.FullName + _
+	                        "), max 'Maximum' max(" + Field.FullName + _
+	                        "), mean 'Mean' mean(" + Field.FullName + _
+	                        "), StdDev 'Standard deviation' StdDev(" + Field.FullName + _
+	                        "), StdErr 'Standard error' StdErr(" + Field.FullName + ")}"
+	                  End If
+	           	  End If       
+               End If
+            Case ObjectTypesConstants.mtClass, ObjectTypesConstants.mtCompound, _
+              ObjectTypesConstants.mtGrid, ObjectTypesConstants.mtArray
+               ' It's a container, process the contents
+               CreateAxisExpressions(Field.Fields)
+         End Select
+      Next
+   End Sub
+
+   MDM.Save(InputMDD)
+
+   MDM.Close()
+   
+end event
+
+
+
+'-----------------------------------------------------
+'Edit Metadata for Tabs
+'-----------------------------------------------------
+	
+Metadata(ENU, Analysis, Label, myInputDataSource)
+
+
+
+'-----------------------------------------------------
+'Always include Overall & Overall2
+'-----------------------------------------------------
+Overall 			long axis("{'Overall' Base('Overall=1'), e1 'Overall' expression('Overall=1') [IsHidden=TRUE]}");
+Overall2 "Overall" 	long axis("{'Base' Base('Overall=1'), e2 'Unweighted Base' UnWeightedBase('Overall=1'), e1 'Overall' expression('Overall=1') [IsHidden=TRUE]}");
+
+
+'-----------------------------------------------------
+'List All Banner Variables & Hide the Base
+'-----------------------------------------------------
+GenderG  categorical axis("{base() [IsHidden=True], ..}");
+Age5  categorical axis("{base() [IsHidden=True], ..}");
+Age5Gen  categorical axis("{base() [IsHidden=True], ..}");
+Quads  categorical axis("{base() [IsHidden=True], ..}");
+Age2  categorical axis("{base() [IsHidden=True], ..}");
+P912  categorical axis("{base() [IsHidden=True], ..}");
+Gamer  categorical axis("{base() [IsHidden=True], ..}");
+ClashAware  categorical axis("{base() [IsHidden=True], ..}");
+ClashPlayer  categorical axis("{base() [IsHidden=True], ..}");
+PokePlayer  categorical axis("{base() [IsHidden=True], ..}");
+PokeAware  categorical axis("{base() [IsHidden=True], ..}");
+MobSpend  categorical axis("{base() [IsHidden=True], ..}");
+JWAware  categorical axis("{base() [IsHidden=True], ..}");
+JWFanship  categorical axis("{base() [IsHidden=True], ..}");
+OverlapA  categorical axis("{base() [IsHidden=True], ..}");
+OverlapB  categorical axis("{base() [IsHidden=True], ..}");
+OverlapC  categorical axis("{base() [IsHidden=True], ..}");
+
+
+
+'-----------------------------------------------------
+'Fix Bases for Summary Variables
+'-----------------------------------------------------
+
+
+
+'-----------------------------------------------------
+'Nets
+'-----------------------------------------------------
+
+
+'-----------------------------------------------------
+'Anchoring
+'-----------------------------------------------------
+
+
+
+'-----------------------------------------------------
+'Grids - Manual
+'-----------------------------------------------------
+'AList define {
+'A1 "Has good original TV shows and movies",
+'A2 "Has many of my favorite TV shows",
+'A3 "Has many of my favorite movies",
+'A4 "Has great content",
+'A5 "Has a wide variety of TV shows and movies",
+'A6 "Is easy to watch on different devices",
+'A7 "Has a good selection of TV show episodes",
+'A8 "Has a good selection of movies",
+'A9 "Is easy to find what I want",
+'A10 "Has good TV show and movie recommendations",
+'A11 "Has hit TV shows currently airing on other networks",
+'A12 "Has movies I can't find anywhere else",
+'A13 "Has TV shows I can't find anywhere else",
+'A14 "Has fresh content",
+'A15 "Is a great value",
+'A16 "Is easy to use",
+'A17 "Is convenient to use",
+'A18 "Is reliable",
+'A19 "Has TV show and movie options that change often",
+'A20 "Is available everywhere",
+'A21 "For people like me",
+'A22 "For everyone",
+'A23 "Is innovative",
+'A24 "Is unique",
+'A25 "Doesn't take themselves too seriously",
+'A26 "Is a network/app/service I can't live without",
+'A27 "Understands what I want and need",
+'A28 "First place that I go to when I want to watch something",
+'A29 "Is cool",
+'A30 "Is fun",
+'None
+'};
+'
+'AttGrid "Ideal vs. Crackle" loop
+'{
+'    B1 "Ideal (%Very Important)",
+'    B2 "Crackle"
+'} fields
+'	(
+'	    "Column" "Attribute"
+'	    categorical {use AList} axis("{base(), UnweightedBase(), .., None [IsHidden=TRUE]}");
+'	
+'	) expand grid;
+'
+'Attributes1 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'Attributes2 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'Attributes3 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'Attributes4 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'Attributes5 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'Attributes6 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'Attributes7 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'Attributes8 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'Attributes9 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'
+'AttributesU1 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesU2 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesU3 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesU4 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesU5 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesU6 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesU7 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesU8 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesU9 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'
+'AttributesCU1 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesCU2 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesCU3 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesCU4 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesCU5 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesCU6 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesCU7 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesCU8 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesCU9 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'
+'AttributesLU1 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesLU2 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesLU3 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesLU4 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesLU5 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesLU6 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesLU7 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesLU8 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesLU9 categorical axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'
+'AttributesN1 categorical expression("Attributes1") axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesN2 categorical expression("Attributes2") axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesN3 categorical expression("Attributes3") axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesN4 categorical expression("Attributes4") axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesN5 categorical expression("Attributes5") axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesN6 categorical expression("Attributes6") axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesN7 categorical expression("Attributes7") axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesN8 categorical expression("Attributes8") axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'AttributesN9 categorical expression("Attributes9") axis("{base(), UnweightedBase(),.., none_of_these [isfixed=true]}");
+'
+'AttributesLUN1 categorical expression("AttributesLU1") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'AttributesLUN2 categorical expression("AttributesLU2") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'AttributesLUN3 categorical expression("AttributesLU3") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'AttributesLUN4 categorical expression("AttributesLU4") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'AttributesLUN5 categorical expression("AttributesLU5") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'AttributesLUN6 categorical expression("AttributesLU6") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'AttributesLUN7 categorical expression("AttributesLU7") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'AttributesLUN8 categorical expression("AttributesLU8") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'AttributesLUN9 categorical expression("AttributesLU9") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'
+'AttributesCUN1 categorical expression("AttributesCU1") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'AttributesCUN2 categorical expression("AttributesCU2") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'AttributesCUN3 categorical expression("AttributesCU3") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'AttributesCUN4 categorical expression("AttributesCU4") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'AttributesCUN5 categorical expression("AttributesCU5") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'AttributesCUN6 categorical expression("AttributesCU6") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'AttributesCUN7 categorical expression("AttributesCU7") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'AttributesCUN8 categorical expression("AttributesCU8") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'AttributesCUN9 categorical expression("AttributesCU9") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'
+'
+'AttributesUN1 categorical expression("AttributesU1") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'AttributesUN2 categorical expression("AttributesU2") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'AttributesUN3 categorical expression("AttributesU3") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'AttributesUN4 categorical expression("AttributesU4") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'AttributesUN5 categorical expression("AttributesU5") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'AttributesUN6 categorical expression("AttributesU6") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'AttributesUN7 categorical expression("AttributesU7") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'AttributesUN8 categorical expression("AttributesU8") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'AttributesUN9 categorical expression("AttributesU9") axis("{base(),UnweightedBase(), .., none_of_these [isfixed=true]}");
+'
+'OriginalsB_A1 "% Crackle Correct (Amg Aware)" categorical expression("OriginalsB_TB ");
+'OriginalsB_A2 "% Hulu Correct (Amg Aware)" categorical expression("OriginalsB_2B ");
+'OriginalsB_A3 "% Netflix Correct (Amg Aware)" categorical expression("OriginalsB_3B ");
+'OriginalsB_A4 "% Amazon Correct (Amg Aware)" categorical expression("OriginalsB_4B");
+'
+''OriginalsB_TB categorical axis("{base() [IsHidden=TRUE], b1'Base' base('OriginalsB1 is not null') [isHidden=TRUE], OriginalsB1, b2'Base' base('OriginalsB2 is not null') [isHidden=TRUE], OriginalsB2, b3'Base' base('OriginalsB3 is not null') [isHidden=TRUE], OriginalsB3, b4'Base' base('OriginalsB4 is not null') [isHidden=TRUE], OriginalsB4, b5'Base' base('OriginalsB5 is not null') [isHidden=TRUE], OriginalsB5, b6'Base' base('OriginalsB6 is not null') [isHidden=TRUE], OriginalsB6, b7'Base' base('OriginalsB7 is not null') [isHidden=TRUE], OriginalsB7, b8'Base' base('OriginalsB8 is not null') [isHidden=TRUE], OriginalsB8, b9'Base' base('OriginalsB9 is not null') [isHidden=TRUE], OriginalsB9, b10'Base' base('OriginalsB10 is not null') [isHidden=TRUE], OriginalsB10, b11'Base' base('OriginalsB11 is not null') [isHidden=TRUE], OriginalsB11, b12'Base' base('OriginalsB12 is not null') [isHidden=TRUE], OriginalsB12, b13'Base' base('OriginalsB13 is not null') [isHidden=TRUE], OriginalsB13, b14'Base' base('OriginalsB14 is not null') [isHidden=TRUE], OriginalsB14, b15'Base' base('OriginalsB15 is not null') [isHidden=TRUE], OriginalsB15, b16'Base' base('OriginalsB16 is not null') [isHidden=TRUE], OriginalsB16, b17'Base' base('OriginalsB17 is not null') [isHidden=TRUE], OriginalsB17, b18'Base' base('OriginalsB18 is not null') [isHidden=TRUE], OriginalsB18, b19'Base' base('OriginalsB19 is not null') [isHidden=TRUE], OriginalsB19}");
+'
+'OriginalsB_TB categorical axis("{base() [IsHidden=TRUE],unweightedbase() [IsHidden=TRUE], b1'Base' base('OriginalsB1 is not null') [isHidden=TRUE], OriginalsB1, b2'Base' base('OriginalsB2 is not null') [isHidden=TRUE], OriginalsB2, b3'Base' base('OriginalsB3 is not null') [isHidden=TRUE], OriginalsB3, b4'Base' base('OriginalsB4 is not null') [isHidden=TRUE], OriginalsB4, b5'Base' base('OriginalsB5 is not null') [isHidden=TRUE], OriginalsB5, b6'Base' base('OriginalsB6 is not null') [isHidden=TRUE], OriginalsB6, b7'Base' base('OriginalsB7 is not null') [isHidden=TRUE], OriginalsB7}");
+'OriginalsB_2B categorical axis("{base() [IsHidden=TRUE],unweightedbase() [IsHidden=TRUE], b8'Base' base('OriginalsB8 is not null') [isHidden=TRUE], OriginalsB8, b9'Base' base('OriginalsB9 is not null') [isHidden=TRUE], OriginalsB9, b10'Base' base('OriginalsB10 is not null') [isHidden=TRUE], OriginalsB10, b11'Base' base('OriginalsB11 is not null') [isHidden=TRUE], OriginalsB11, b12'Base' base('OriginalsB12 is not null') [isHidden=TRUE], OriginalsB12}");
+'OriginalsB_3B categorical axis("{base() [IsHidden=TRUE],unweightedbase() [IsHidden=TRUE], b13'Base' base('OriginalsB13 is not null') [isHidden=TRUE], OriginalsB13, b14'Base' base('OriginalsB14 is not null') [isHidden=TRUE], OriginalsB14, b15'Base' base('OriginalsB15 is not null') [isHidden=TRUE], OriginalsB15, b16'Base' base('OriginalsB16 is not null') [isHidden=TRUE], OriginalsB16, b17'Base' base('OriginalsB17 is not null') [isHidden=TRUE], OriginalsB17, b18'Base' base('OriginalsB18 is not null') [isHidden=TRUE], OriginalsB18, b19'Base' base('OriginalsB19 is not null') [isHidden=TRUE], OriginalsB19, b20'Base' base('OriginalsB20 is not null') [isHidden=TRUE], OriginalsB20, b21'Base' base('OriginalsB21 is not null') [isHidden=TRUE], OriginalsB21, b22'Base' base('OriginalsB22 is not null') [isHidden=TRUE], OriginalsB22, b23'Base' base('OriginalsB23 is not null') [isHidden=TRUE], OriginalsB23, b24'Base' base('OriginalsB24 is not null') [isHidden=TRUE], OriginalsB24, b25'Base' base('OriginalsB25 is not null') [isHidden=TRUE], OriginalsB25, b26'Base' base('OriginalsB26 is not null') [isHidden=TRUE], OriginalsB26, b27'Base' base('OriginalsB27 is not null') [isHidden=TRUE], OriginalsB27, b28'Base' base('OriginalsB28 is not null') [isHidden=TRUE], OriginalsB28, b29'Base' base('OriginalsB29 is not null') [isHidden=TRUE], OriginalsB29, b30'Base' base('OriginalsB30 is not null') [isHidden=TRUE], OriginalsB30}");
+'OriginalsB_4B categorical axis("{base() [IsHidden=TRUE],unweightedbase() [IsHidden=TRUE], b20'Base' base('OriginalsB20 is not null') [isHidden=TRUE], OriginalsB20, b21'Base' base('OriginalsB21 is not null') [isHidden=TRUE], OriginalsB21, b22'Base' base('OriginalsB22 is not null') [isHidden=TRUE], OriginalsB22, b23'Base' base('OriginalsB23 is not null') [isHidden=TRUE], OriginalsB23, b24'Base' base('OriginalsB24 is not null') [isHidden=TRUE], OriginalsB24, b25'Base' base('OriginalsB25 is not null') [isHidden=TRUE], OriginalsB25, b26'Base' base('OriginalsB26 is not null') [isHidden=TRUE], OriginalsB26, b27'Base' base('OriginalsB27 is not null') [isHidden=TRUE], OriginalsB27, b28'Base' base('OriginalsB28 is not null') [isHidden=TRUE], OriginalsB28, b29'Base' base('OriginalsB29 is not null') [isHidden=TRUE], OriginalsB29, b30'Base' base('OriginalsB30 is not null') [isHidden=TRUE], OriginalsB30, b31'Base' base('OriginalsB31 is not null') [isHidden=TRUE], OriginalsB31, b32'Base' base('OriginalsB32 is not null') [isHidden=TRUE], OriginalsB32, b33'Base' base('OriginalsB33 is not null') [isHidden=TRUE], OriginalsB33, b34'Base' base('OriginalsB34 is not null') [isHidden=TRUE], OriginalsB34}");
+'
+'Aware1 categorical axis("{base(),UnweightedBase(), Net1 'Aware' net({Currently_watch_shows_movies_or_other_content_on_it, Have_used_it_in_the_past_but_not_now, Aware_of_it_but_have_never_used_it}), Never_heard_of_it_before, eExpression 'Ever Used' expression('Aware1.ContainsAny({Currently_watch_shows_movies_or_other_content_on_it, Have_used_it_in_the_past_but_not_now})')}");
+'Aware2 categorical axis("{base(),UnweightedBase(), Net1 'Aware' net({Currently_watch_shows_movies_or_other_content_on_it, Have_used_it_in_the_past_but_not_now, Aware_of_it_but_have_never_used_it}), Never_heard_of_it_before, eExpression 'Ever Used' expression('Aware2.ContainsAny({Currently_watch_shows_movies_or_other_content_on_it, Have_used_it_in_the_past_but_not_now})')}");
+'Aware3 categorical axis("{base(),UnweightedBase(), Net1 'Aware' net({Currently_watch_shows_movies_or_other_content_on_it, Have_used_it_in_the_past_but_not_now, Aware_of_it_but_have_never_used_it}), Never_heard_of_it_before, eExpression 'Ever Used' expression('Aware3.ContainsAny({Currently_watch_shows_movies_or_other_content_on_it, Have_used_it_in_the_past_but_not_now})')}");
+'Aware4 categorical axis("{base(),UnweightedBase(), Net1 'Aware' net({Currently_watch_shows_movies_or_other_content_on_it, Have_used_it_in_the_past_but_not_now, Aware_of_it_but_have_never_used_it}), Never_heard_of_it_before, eExpression 'Ever Used' expression('Aware4.ContainsAny({Currently_watch_shows_movies_or_other_content_on_it, Have_used_it_in_the_past_but_not_now})')}");
+'Aware5 categorical axis("{base(),UnweightedBase(), Net1 'Aware' net({Currently_watch_shows_movies_or_other_content_on_it, Have_used_it_in_the_past_but_not_now, Aware_of_it_but_have_never_used_it}), Never_heard_of_it_before, eExpression 'Ever Used' expression('Aware5.ContainsAny({Currently_watch_shows_movies_or_other_content_on_it, Have_used_it_in_the_past_but_not_now})')}");
+'Aware6 categorical axis("{base(),UnweightedBase(), Net1 'Aware' net({Currently_watch_shows_movies_or_other_content_on_it, Have_used_it_in_the_past_but_not_now, Aware_of_it_but_have_never_used_it}), Never_heard_of_it_before, eExpression 'Ever Used' expression('Aware6.ContainsAny({Currently_watch_shows_movies_or_other_content_on_it, Have_used_it_in_the_past_but_not_now})')}");
+'Aware7 categorical axis("{base(),UnweightedBase(), Net1 'Aware' net({Currently_watch_shows_movies_or_other_content_on_it, Have_used_it_in_the_past_but_not_now, Aware_of_it_but_have_never_used_it}), Never_heard_of_it_before, eExpression 'Ever Used' expression('Aware7.ContainsAny({Currently_watch_shows_movies_or_other_content_on_it, Have_used_it_in_the_past_but_not_now})')}");
+'Aware8 categorical axis("{base(),UnweightedBase(), Net1 'Aware' net({Currently_watch_shows_movies_or_other_content_on_it, Have_used_it_in_the_past_but_not_now, Aware_of_it_but_have_never_used_it}), Never_heard_of_it_before, eExpression 'Ever Used' expression('Aware7.ContainsAny({Currently_watch_shows_movies_or_other_content_on_it, Have_used_it_in_the_past_but_not_now})')}");
+'Aware9 categorical axis("{base(),UnweightedBase(), Net1 'Aware' net({Currently_watch_shows_movies_or_other_content_on_it, Have_used_it_in_the_past_but_not_now, Aware_of_it_but_have_never_used_it}), Never_heard_of_it_before, eExpression 'Ever Used' expression('Aware7.ContainsAny({Currently_watch_shows_movies_or_other_content_on_it, Have_used_it_in_the_past_but_not_now})')}");
+'
+''OEIdeal_Code categorical axis("{base(),UnweightedBase(),.., Other [IsFixed=True], Don_t_know_Garbage_response_Bad_data [isfixed=true]}");
+''OEServ_Code categorical axis("{base(),UnweightedBase(), .., Other [IsFixed=True], Don_t_know_Garbage_response_Bad_data [isfixed=true]}");
+''OETop1_Code categorical axis("{ base('AwareO1=1'),unweightedbase('AwareO1=1'), .., Other [IsFixed=True], Don_t_know_Garbage_response_Bad_data [isfixed=true]}");
+''OETop2_Code categorical axis("{ base('AwareO2=1'),unweightedbase('AwareO2=1'), .., Other [IsFixed=True], Don_t_know_Garbage_response_Bad_data [isfixed=true]}");
+''OETop3_Code categorical axis("{ base('AwareO3=1'),unweightedbase('AwareO3=1'), .., Other [IsFixed=True], Don_t_know_Garbage_response_Bad_data [isfixed=true]}");
+''OETop4_Code categorical axis("{ base('AwareO4=1'),unweightedbase('AwareO4=1'),.., Other [IsFixed=True], Don_t_know_Garbage_response_Bad_data [isfixed=true]}");
+''OETop5_Code categorical axis("{ base('CrackleFam5 is not null'),unweightedbase('CrackleFam5 is not null'),  .., Other [IsFixed=True], Don_t_know_Garbage_response_Bad_data [isfixed=true]}");
+''OETop6_Code categorical axis("{ base('CrackleFam6 is not null'),unweightedbase('CrackleFam6 is not null'), .., Other [IsFixed=True], Don_t_know_Garbage_response_Bad_data [isfixed=true]}");
+''OETop7_Code categorical axis("{ base('CrackleFam7 is not null'),unweightedbase('CrackleFam7 is not null'),  .., Other [IsFixed=True], Don_t_know_Garbage_response_Bad_data [isfixed=true]}");
+''OETopB_Code categorical axis("{base(),UnweightedBase(), .., Other [IsFixed=True], Garbage_response_Bad_data [isfixed=true]}");
+''
+	 
+End Metadata
+
+'-----------------------------------------------------
+'Assign Values for Sumary Variables
+'-----------------------------------------------------
+
+Event(OnNextCase, "")
+
+
+'AttGrid[{B1}].Column = {none}
+'	if Attributes1 is not null then AttGrid[{B2}].Column = {none}
+'	
+'	Dim i
+'	
+'	for i = 1 to 30 	
+'		if dmgrQuestions["Ideal" + makestring(i)].ContainsAny({Very_important}) then AttGrid[{B1}].Column = AttGrid[{B1}].Column + Ccategorical("A" + makestring(i))	
+'	next
+'	
+'	
+'	IF Attributes1.ContainsAny({Has_good_original_TV_shows_and_movies }) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A1")
+'	IF Attributes1.ContainsAny({Has_many_of_my_favorite_TV_shows }) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A2")
+'	IF Attributes1.ContainsAny({Has_many_of_my_favorite_movies }) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A3")
+'	IF Attributes1.ContainsAny({Has_great_content}) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A4")
+'	IF Attributes1.ContainsAny({Has_a_wide_variety_of_TV_shows_and_movies }) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A5")
+'	IF Attributes1.ContainsAny({Is_easy_to_watch_on_different_devices}) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A6")
+'	IF Attributes1.ContainsAny({Has_a_good_selection_of_TV_show_episodes}) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A7")
+'	IF Attributes1.ContainsAny({Has_a_good_selection_of_movies}) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A8")
+'	IF Attributes1.ContainsAny({Is_easy_to_find_what_I_want }) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A9")
+'	IF Attributes1.ContainsAny({Has_good_TV_show_movie_recommendations}) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A10")
+'	IF Attributes1.ContainsAny({Has_hit_TV_shows_currently_airing_on_other_networks}) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A11")
+'	IF Attributes1.ContainsAny({Has_movies_hard_to_find_anywhere_else}) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A12")
+'	IF Attributes1.ContainsAny({Has_TV_shows_I_can_t_find_anywhere_else }) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A13")
+'	IF Attributes1.ContainsAny({Has_fresh_content  }) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A14")
+'	IF Attributes1.ContainsAny({Is_a_great_value}) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A15")
+'	IF Attributes1.ContainsAny({Is_easy_to_use}) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A16")
+'	IF Attributes1.ContainsAny({Is_convenient_to_use}) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A17")
+'	IF Attributes1.ContainsAny({Is_reliable}) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A18")
+'	IF Attributes1.ContainsAny({Has_TV_show_and_movie_options_that_change_often}) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A19")
+'	IF Attributes1.ContainsAny({Is_available_everywhere}) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A20")
+'	IF Attributes1.ContainsAny({For_people_like_me}) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A21")
+'	IF Attributes1.ContainsAny({For_everyone}) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A22")
+'	IF Attributes1.ContainsAny({Is_innovative}) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A23")
+'	IF Attributes1.ContainsAny({Is_unique}) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A24")
+'	IF Attributes1.ContainsAny({Doesn’t_take_themselves_too_seriously}) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A25")
+'	IF Attributes1.ContainsAny({Is_a_network_app_service_I_can_t_live_without }) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A26")
+'	IF Attributes1.ContainsAny({Understands_what_I_want_and_need}) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A27")
+'	IF Attributes1.ContainsAny({First_place_that_I_go_to_when_I_want_to_watch_something }) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A28")
+'	IF Attributes1.ContainsAny({Is_cool}) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A29")
+'	IF Attributes1.ContainsAny({Is_fun}) then AttGrid[{B2}].Column = AttGrid[{B2}].Column + ccategorical("A30")
+
+'-----------------------------------------------------
+'Paste in Code from OnNextCase.txt
+'-----------------------------------------------------
+
+
+
+
+
+End Event
+
+        
+InputDatasource(myInputDataSource, "GenPar")
+    ConnectionString = "Provider=mrOleDB.Provider.2; _
+    	Data Source=mrSavDsc; _
+    	Location=" + InputSAV + "; _
+    	Initial Catalog=" + InputMDD
+    	SelectQuery = "Select * From hdata"
+End InputDatasource
+
+ 
+ OutputDataSource(DDFOutput)
+   ConnectionString = "Provider=mrOleDB.Provider.2; _
+       Data Source=mrDataFileDsc; _
+       Location=" + TargetDDF + "; _
+       MR Init Overwrite=1"         
+   MetaDataOutputName = TargetMdd  
+End OutputDataSource
