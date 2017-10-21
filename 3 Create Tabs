@@ -1,0 +1,506 @@
+Dim Project, TableDoc, Sample[], Cntry[], CStart, CEnd, SampStart, SampEnd, C, S, AxisTop, AxisSide, DDF_FILE, MDD_FILE, EXPORT_FILE, BoxListNum, Screener, Client, TypeofProject
+
+'*******************************************'
+'	Define Path	& Project					'
+'*******************************************'
+#define myPath "K:\Life of Kylie Brand Study\Field and Tabs\Wave 1\"
+Project  = "Life of Kylie"
+TypeofProject = "Brand Study"
+
+'*******************************************'
+'	Define Samples & Countries				'
+'*******************************************'
+
+Sample[1] = "General"
+Sample[2] = "Parent"
+Sample[3] = "Kids"
+
+Cntry[0] = "All Countries"
+Cntry[1] = "US"
+Cntry[2] = "UK"
+Cntry[3] = "FR"
+Cntry[4] = "DE"
+Cntry[5] = "ES"
+Cntry[6] = "MX"
+Cntry[7] = "BR"
+Cntry[8] = "RU"
+Cntry[9] = "CN"
+Cntry[10] = "JP"
+Cntry[11] = "KR"
+Cntry[12] = "HK"
+
+Screener = 0
+Client = 0
+
+'*******************************************'
+'	Country Numbers to Run					'
+'*******************************************'
+CStart   = 1
+CEnd	 = 1
+
+For C = CStart to CEnd
+
+	'*******************************************'
+	'	Sample Numbers to Run					'
+	'*******************************************'
+
+	SampStart   = 1
+	SampEnd	    = 1
+	
+	For S = SampStart to SampEnd
+	
+		'*******************************************'
+		'	Read in Data							'
+		'*******************************************'
+		
+		Set TableDoc = CreateObject("TOM.Document")
+		
+		if Screener = 0 then DDF_FILE = myPath + "Tabs\Tab Prep\Data1 " + Cntry[1] + ".ddf"
+		if Screener = 0 then MDD_FILE = myPath + "Tabs\Tab Prep\Data1 " + Cntry[1] + ".mdd"
+		
+		if Screener = 1 then DDF_FILE = myPath + "Tabs\Tab Prep\Data1 " + Cntry[1] + " Screener.ddf"
+		if Screener = 1 then MDD_FILE = myPath + "Tabs\Tab Prep\Data1 " + Cntry[1] + " Screener.mdd"
+		
+		if S = 3 then DDF_FILE = myPath + "Tabs\Tab Prep\Data1K " + Cntry[1] + ".ddf"
+		if S = 3 then MDD_FILE = myPath + "Tabs\Tab Prep\Data1K " + Cntry[1] + ".mdd"	
+		
+		TableDoc.DataSet.Load(MDD_FILE, , DDF_FILE, "mrDataFileDsc")	
+		
+		'*******************************************'
+		'	Global Table Properties					'
+		'*******************************************'
+		
+		TableDoc.Default.CellItems.Clear()
+		TableDoc.Default.CellItems.AddNew(&H0001,2)
+		TableDoc.Default.Properties["AutoUnweightedBases"] = False
+		TableDoc.Default.Annotations.ClearAll()
+		
+		If Screener = 0 then
+		TableDoc.Global.Clear()
+		With TableDoc.Global      
+		   .Annotations[0].Specification = Project + " " + TypeofProject + " Study (" + Sample[S] + " Sample) - " + Cntry[C]
+		   .Annotations[1].Specification = "{TableDescription \n}"
+		   .Annotations[3].Specification = "Table: {TableNumber}"
+		   .Annotations[5].Specification = "{WeightVariable \n\p}{Filters \n\p}{SortColumn \n\p}{Statistics }"
+		End With
+		End If
+		
+		If Screener = 1 then
+		TableDoc.Global.Clear()
+		With TableDoc.Global      
+		   .Annotations[0].Specification = Project + " " + TypeofProject + " Study (" + Sample[S] + " Screener Sample) - " + Cntry[C]
+		   .Annotations[1].Specification = "{TableDescription \n}"
+		   .Annotations[3].Specification = "Table: {TableNumber}"
+		   .Annotations[5].Specification = "{WeightVariable \n\p}{Filters \n\p}{SortColumn \n\p}{Statistics }"
+		End With
+		End If
+		
+		'----------------------------
+		'Global Filters				'
+		'----------------------------
+		
+'		If Sample[S] = "General" then TableDoc.Global.Filters.AddNew("Sample", "Sample_Type.ContainsAny({General})")
+'		If Sample[S] = "Parent" then TableDoc.Global.Filters.AddNew("Sample", "Sample_Type.ContainsAny({Parent})")
+
+'		if Cntry[C] = "US" then TableDoc.Global.Filters.AddNew("Terr", "TerrCheck.ContainsAny({United_States})")
+'		if Cntry[C] = "UK" then TableDoc.Global.Filters.AddNew("Terr", "TerrCheck.ContainsAny({United_Kingdom})")
+'		if Cntry[C] = "FR" then TableDoc.Global.Filters.AddNew("Terr", "TerrCheck.ContainsAny({France})")
+'		if Cntry[C] = "DE" then TableDoc.Global.Filters.AddNew("Terr", "TerrCheck.ContainsAny({Germany})")
+'		if Cntry[C] = "ES" then TableDoc.Global.Filters.AddNew("Terr", "TerrCheck.ContainsAny({Spain})")
+'		if Cntry[C] = "MX" then TableDoc.Global.Filters.AddNew("Terr", "TerrCheck.ContainsAny({Mexico})")
+'		if Cntry[C] = "BR" then TableDoc.Global.Filters.AddNew("Terr", "TerrCheck.ContainsAny({Brazil})")
+'		if Cntry[C] = "RU" then TableDoc.Global.Filters.AddNew("Terr", "TerrCheck.ContainsAny({Russia})")
+'		if Cntry[C] = "CN" then TableDoc.Global.Filters.AddNew("Terr", "TerrCheck.ContainsAny({China})")
+'		if Cntry[C] = "JP" then TableDoc.Global.Filters.AddNew("Terr", "TerrCheck.ContainsAny({Japan})")
+'		if Cntry[C] = "KR" then TableDoc.Global.Filters.AddNew("Terr", "TerrCheck.ContainsAny({South_Korea})")
+'		if Cntry[C] = "HK" then TableDoc.Global.Filters.AddNew("Terr", "TerrCheck.ContainsAny({Hong_Kong})")		
+		
+		'*******************************************'
+		'	Create Banner(s)						'
+		'*******************************************'
+		
+		Set AxisTop = TableDoc.Axes.AddNew("TopBanner") 
+		Set AxisSide = TableDoc.Axes.AddNew("SideBanner")
+		
+		'---------------
+		'Top Banner
+		'---------------
+		
+'		if C = 0 then 
+'			if S = 1 then AxisTop.Specification = "Overall + Country + GenderG + Country as C2 > GenderG + Age5 + Age5gen +  Quads + Age2 + Country as C3 > Age2 + IntEp8 + SWFan + SegA + Seg2 + Seg1 + CompFan + TFAView + OldSW + RateBan + ROInt + Action + Adventure + SciFi + Super + Hollywood"
+'			if S = 2 then AxisTop.Specification = "Overall + Country + GenderP + Country as C2 > GenderP + GenderK + AgeK + AgeGenK + pIntEp8 + SWFan + SegA + Seg2 + Seg1 + CompFan + TFAView + OldSW + pOldSW + RateBan + ROInt + Action + Adventure + SciFi + Super + Hollywood"
+'		end if
+		
+		if C = 1 then 
+			if S = 1 and Screener = 1 then AxisTop.Specification = "Overall + GenderG"
+			if S = 1 and Screener = 0 then AxisTop.Specification = "Overall + GenderG"
+'			if S = 2 then AxisTop.Specification = "Overall + GenderG + Age3 + Age2 + AgeGenBy3 + Quads + User1 + Pre1 + Post1 + Race2 + Segment + Conc + HorFan + SciFan + ThrillFan + SusFan + ExclView + OrigView + YTRedSub + RocChanView + AweChanView + RocShowView + AweShowView"
+		end if
+'		
+'		if C > 1 then 
+'			if S = 1 then AxisTop.Specification = "Overall + GenderG + Age5 + Age5gen +  Quads + Age2 + IntEp8 + SWFan + SegA + Seg2 + Seg1 + CompFan + TFAView + OldSW + RateBan + ROInt + Action + Adventure + SciFi + Super + Hollywood"
+'			if S = 2 then AxisTop.Specification = "Overall + GenderP + GenderK + AgeK + AgeGenK + pIntEp8 + SWFan + SegA + Seg2 + Seg1 + CompFan + TFAView + OldSW + pOldSW + RateBan + ROInt + Action + Adventure + SciFi + Super + Hollywood"
+'		end if
+		
+		'-----------------------------------------
+		'Side Banner for Banner X Banner (Table1)
+		'-----------------------------------------
+'		if C = 0 then 
+'			if S = 1 then AxisSide.Specification = "Overall2 + Country + GenderG + Age5 + Age5gen +  Quads + Age2 + IntEp8 + SWFan + SegA + Seg2 + Seg1 + CompFan + TFAView + OldSW + RateBan + ROInt + Action + Adventure + SciFi + Super + Hollywood"
+'			if S = 2 then AxisSide.Specification = "Overall2 + Country + GenderP + GenderK + AgeK + AgeGenK + pIntEp8 + SWFan + SegA + Seg2 + Seg1 + CompFan + TFAView + OldSW + pOldSW + RateBan + ROInt + Action + Adventure + SciFi + Super + Hollywood"
+'		end if
+		
+		If C > 0 then 
+			AxisSide.Specification = AxisTop.Specification
+			AxisSide.SubAxes.Remove(0)			
+			AxisSide.Specification = "Overall2 +" + AxisSide.Specification
+		end if
+		
+		
+		
+		'----------------------------
+		'Create Tables				'
+		'----------------------------
+		
+		
+		Dim i, Ttl[], Amg[], QRE[], Banner, var[], ListNum, SortCol, we, OEList[], WgtVar, GridBanner, Brands[]
+	
+		SortCol = "first"
+		WgtVar = "weight"	
+		
+		With TableDoc
+		
+			Banner = "Axis(TopBanner)"
+			
+			Ttl[1] = "Banner"
+			QRE[1] = "Banner"
+			Amg[1] = "All"
+			Var[1] = "Axis(SideBanner)"
+				MakeTab(var[1], Banner, Amg[1], QRE[1], Ttl[1], TableDoc, 0, "first", 0, "None")
+					
+			QRE[1] = "NetView"
+			Ttl[1] = "TV Network Watchship"
+			Amg[1] = "All"
+			Var[1] = QRE[1]
+				MakeTab(var[1], Banner, Amg[1], QRE[1], Ttl[1], TableDoc, 1, "first", 0, "None")
+				
+			QRE[1] = "ShowTimes"
+			Ttl[1] = "How Often Watch New Episodes"
+			Amg[1] = "All"
+			Var[1] = QRE[1]
+				MakeTab(var[1], Banner, Amg[1], QRE[1], Ttl[1], TableDoc, 1, "first", 0, "None")
+				
+			QRE[1] = "CelebFollow"
+			Ttl[1] = "Celebrity Fanship"
+			Amg[1] = "All"
+			Var[1] = QRE[1]
+				MakeTab(var[1], Banner, Amg[1], QRE[1], Ttl[1], TableDoc, 1, "first", 0, "None")
+				
+			QRE[1] = "LOKDigital"
+			Ttl[1] = "Kylie Jenner Social Media/Digital Actions"
+			Amg[1] = "Aware of Kylie Jenner"
+			Var[1] = QRE[1]
+				MakeTab(var[1], Banner, Amg[1], QRE[1], Ttl[1], TableDoc, 1, "first", 0, "None")
+				
+			QRE[1] = "Validation"
+			Ttl[1] = "Validation of Viewers"
+			Amg[1] = "Watchers of LOK on E!"
+			Var[1] = QRE[1]
+				MakeTab(var[1], Banner, Amg[1], QRE[1], Ttl[1], TableDoc, 1, "first", 0, "None")
+				
+			QRE[1] = "LOKViewer, AKViewer"
+			Ttl[1] = "Life of Kylie/Ask Kylie Viewership"
+			Amg[1] = "All"
+			Var[1] = RemCom(QRE[1])
+				MakeTab(var[1], Banner, Amg[1], QRE[1], Ttl[1], TableDoc, 1, "first", 0, "None")
+				
+				
+				
+	If Screener = 0 Then
+				
+			QRE[1] = "Subscriptions"
+			Ttl[1] = "Subscriptions"
+			Amg[1] = "All"
+			Var[1] = QRE[1]
+				MakeTab(var[1], Banner, Amg[1], QRE[1], Ttl[1], TableDoc, 1, "first", 0, "None")
+				
+			QRE[1] = "SocialPlatUsage"
+			Ttl[1] = "Social Platform Usage"
+			Amg[1] = "All"
+			Var[1] = QRE[1]
+				MakeTab(var[1], Banner, Amg[1], QRE[1], Ttl[1], TableDoc, 1, "first", 0, "None")
+				
+			QRE[1] = "SnapBrands"
+			Ttl[1] = "Snapchat Story Watchship"
+			Amg[1] = "Use Snapchat At Least a Few Times a Month"
+			Var[1] = QRE[1]
+				MakeTab(var[1], Banner, Amg[1], QRE[1], Ttl[1], TableDoc, 1, "first", 0, "None")
+				
+			QRE[1] = "KylieSocialAffinity"
+			Ttl[1] = "Kylie Jenner Experience Rating"
+			Amg[1] = "Follow/Watch Kylie Jenner on Each Platform"
+			Var[1] = QRE[1]
+				MakeTab(var[1], Banner, Amg[1], QRE[1], Ttl[1], TableDoc, 1, "first", 0, "None")
+				
+			QRE[1] = "Expectations"
+			Ttl[1] = "LOK vs Expectations"
+			Amg[1] = "Watched LOK"
+			Var[1] = QRE[1]
+				MakeTab(var[1], Banner, Amg[1], QRE[1], Ttl[1], TableDoc, 1, "first", 0, "None")
+				
+			QRE[1] = "BeforeAfter"
+			Ttl[1] = "Kylie Jenner Engagement Before/After LOK"
+			Amg[1] = "Watched LOK"
+			Var[1] = QRE[1]
+				MakeTab(var[1], Banner, Amg[1], QRE[1], Ttl[1], TableDoc, 1, "first", 0, "None")
+				
+			QRE[1] = "ForcedWhyNever"
+			Ttl[1] = "Why Never Watched LOK"
+			Amg[1] = "Never Watched LOK"
+			Var[1] = QRE[1]
+				MakeTab(var[1], Banner, Amg[1], QRE[1], Ttl[1], TableDoc, 1, "first", 0, "None")
+				
+			QRE[1] = "ForcedWhyNotMore"
+			Ttl[1] = "Why Not Watched More LOK"
+			Amg[1] = "Aware of LOK But Don't Watch Every Week"
+			Var[1] = QRE[1]
+				MakeTab(var[1], Banner, Amg[1], QRE[1], Ttl[1], TableDoc, 1, "first", 0, "None")
+				
+			QRE[1] = "SiteVisitation"
+			Ttl[1] = "Site Visitation"
+			Amg[1] = "All"
+			Var[1] = QRE[1]
+				MakeTab(var[1], Banner, Amg[1], QRE[1], Ttl[1], TableDoc, 1, "first", 0, "None")
+				
+			QRE[1] = "Segmentation"
+			Ttl[1] = "Attitudes Toward Reality TV"
+			Amg[1] = "All"
+			Var[1] = QRE[1]
+				MakeTab(var[1], Banner, Amg[1], QRE[1], Ttl[1], TableDoc, 1, "first", 0, "None")
+
+				
+				
+	End If		
+	
+			If Screener = 0 then QRE[1] = "Age, Rac1"
+			If Screener = 1 then QRE[1] = "Age, Rac1"
+			Ttl[1] = "Demographics"
+			Amg[1] = "All"
+			Var[1] = RemCom(QRE[1])
+				MakeTab(var[1], Banner, Amg[1], QRE[1], Ttl[1], TableDoc, 1, "first", 0, "None")
+			
+			'----------------------------
+			'Coded Opens
+			'----------------------------
+			
+			'OEList[1]= "OEHowWatch"
+			'OEList[2]= "OEWhyInt"
+			'OEList[3]= "OEUnique"
+	
+			
+			'for i = 1 to 3
+			'	QRE[1] = OEList[i]
+			'	Ttl[1] = "Coded Open - " + OEList[i]
+			'	Var[1] = OEList[i] + "_Code"
+			'		MakeTab(var[1], Banner, Amg[1], QRE[1], Ttl[1], TableDoc, 1, "first", 0, "None")
+			'next
+	
+			
+			'----------------------------
+			'Weights
+			'----------------------------	
+			For we = 0 to TableDoc.Tables.Count-1
+				TableDoc.Tables[we].weight = WgtVar
+			next
+			
+				
+		End With
+		
+		'----------------------------
+		'Populate the Tables
+		'----------------------------
+	  	TableDoc.Populate()
+	
+		'----------------------------
+		'Save the tables document
+		'----------------------------
+	  	TableDoc.Save(Project + " " + Sample[S] + " " + Cntry[C] + " V1.mtd")
+		
+		'----------------------------
+		'Export the tables 
+		'----------------------------
+		If Screener = 0 then EXPORT_FILE = myPath + "Tabs\Tab Prep\Exports\Export " + Sample[S] + " " + Cntry[C] + ".xlsx"
+		If Screener = 1 then EXPORT_FILE = myPath + "Tabs\Tab Prep\Exports\Export " + Sample[S] + " " + Cntry[C] + " Screener.xlsx"
+	
+		With TableDoc
+				With .Exports["VergeExcelExport"]
+					.Properties["DisplayAnnotations"] = True
+					.Properties["FileFormat"] = "Excel 2007"
+					.Properties["Interactive"] = False
+					.Properties["LaunchApplication"] = False
+					.Properties["OverwriteOutput"] = True
+					.Properties["ElementLabels"] = True
+					.Properties["VariableLabels"] = True
+					.Properties["Destination"] = EXPORT_FILE
+					.Properties["ShowHeadings"] = True
+					.Properties["TableOfContents"] = False
+					.Properties["FreezeFrames"] = False
+					.Properties["PageSetup.LeftMargin"] = 0.15
+					.Properties["PageSetup.RightMargin"] = 0.15
+					.Properties["PageSetup.TopMargin"] = 0.25
+					.Properties["PageSetup.BottomMargin"] = 0.25
+					.Properties["PageSetup.HeaderMargin"] = 0.25
+					.Properties["PageSetup.FooterMargin"] = 0.25
+					.Properties["PageSetup.Orientation"] = 2
+					.Properties["MinimumAnnotationWidth"] = 5
+					.Properties["TopElementWidth"] = 7.5
+					.Properties["SideElementWidth"] = 30
+					.Properties["Colors.VariableLabelCell"] = "#C5D9F1"
+					.Properties["Colors.SignificanceCell"] = "#006100"
+					.Properties["Colors.SignificanceText"] = "#C6EFCE"
+					.Export()
+				End With
+		End With
+		
+		
+	
+'	  With TableDoc.Exports["mrHtmlExport"]
+'	      .Properties["Interactive"] = False
+'	      .Properties["OverwriteOutput"] = True
+'	      .Properties["LaunchApplication"] = True
+'	      .Properties["DisplayOption"] = "Table Only"
+'	      .Properties["LayoutStyle"] = "Frame Table of Contents"
+'	      .Properties["PresentationStyle"] = "Black and White"
+'	      .Export(Project + Sample[S] + Cntry[C] +".htm")
+'	  End With 
+
+	Next
+Next
+	
+
+
+'*******************************************'
+'	SubRoutines & Functions - DO NOT EDIT	'
+'*******************************************'
+
+Sub MakeTab (Side, Top, Amg, QRE, Titl, TableDoc, Sort, SortCol, Filter, FilterSpec)
+With TableDoc
+	.Tables.AddNew("Table" + CText(TableDoc.Tables.Count + 1),  Side + "*" + Top, Titl)
+	.Tables[TableDoc.Tables.Count-1].Annotations[2 ].Specification = "Among " + Amg
+	.Tables[TableDoc.Tables.Count-1].Annotations[4 	].Specification = QRE
+	
+	
+'	if .Tables[TableDoc.Tables.Count-1].Axes[0].SubAxes.Count = 1 then
+'		.Tables[TableDoc.Tables.Count-1].Rules.AddNew(0 '! Hide !', 0 '! Row !', 0, 1 '! LessEqual !', 0)
+'	end if
+'	
+'	if Right(.Tables[TableDoc.Tables.Count-1].Description, 17) = "(Top & Top 2 Box)" then
+'		.Tables[TableDoc.Tables.Count-1].Rules.AddNew(0 '! Hide !', 0 '! Row !', 0, 1 '! LessEqual !', 0)
+'	end if
+'	
+'	
+'	if Right(.Tables[TableDoc.Tables.Count-1].Description, 8) = "(By Box)" then
+'		.Tables[TableDoc.Tables.Count-1].Rules.AddNew(0 '! Hide !', 0 '! Row !', 0, 1 '! LessEqual !', 0)
+'	end if
+	
+	If Sort = 1 then .Tables[TableDoc.Tables.Count-1].SortColumn = SortCol
+	If Filter = 1 then .Tables[TableDoc.Tables.Count-1].Filters.AddNew("Filter1" + CText(TableDoc.Tables.Count + 1), FilterSpec)	
+	
+End With	
+
+End Sub
+
+
+Function ListVars (VarName, Numb)
+Dim i
+	ListVars = ""
+	For i = 1 to Numb
+		if i = 1 then ListVars = VarName + makestring(i)
+		if i > 1 then ListVars = ListVars + " + " + VarName + makestring(i)
+	next
+
+End Function
+
+Function ListVarsByBox (VarName, Numb)
+Dim i
+      ListVarsByBox = ""
+      For i = 1 to Numb
+            if i = 1 then ListVarsByBox = VarName + "_TB"
+            if i > 1 then ListVarsByBox = ListVarsByBox + " + " + VarName + "_" + makestring(i) + "B"
+      next
+
+End Function
+
+Function ListVarsN (VarName, Numb1, Numb2)
+Dim i
+	ListVarsN = ""
+	For i = Numb1 to Numb2
+		if i = Numb1 then ListVarsN = VarName + makestring(i)
+		if i > Numb1 then ListVarsN = ListVarsN + " + " + VarName + makestring(i)
+	next
+
+End Function
+
+
+Function ListVarsX (VarName, Numb1, Numb2)
+Dim i
+	ListVarsX = ""
+	For i = Numb1 to Numb2
+		if i = Numb1 then ListVarsX = VarName + makestring(i)
+		if i > Numb1 then ListVarsX = ListVarsX + " + " + VarName + makestring(i)
+	next
+
+End Function
+
+Function ListVarsInt (VarName, Numb)
+Dim i
+	ListVarsInt = ""
+	For i = 1 to Numb
+		if i = 1 then ListVarsInt = VarName + makestring(i) + "{base(), 'Top 2 Box' net({Definitely_interested, Probably_interested}), Net1 'Bottom 2 Box' net({Probably_not_interested, Definitely_not_interested })}"
+		if i > 1 then ListVarsInt = ListVarsInt + " + " + VarName + makestring(i)+ "{base(), 'Top 2 Box' net({Definitely_interested, Probably_interested}), Net1 'Bottom 2 Box' net({Probably_not_interested, Definitely_not_interested })}"
+	next
+
+End Function
+
+
+
+Function ListVarsShare (VarName, Numb)
+Dim i
+      ListVarsShare = ""
+      For i = 1 to Numb
+            if i = 1 then ListVarsShare = VarName + makestring(i) + "{base(), eMean 'Mean' mean(" + Varname + makestring(i) + ") [Decimals=2], eMinimum 'Minimum' min(" + Varname + makestring(i) + ") [Decimals=2], eMaximum 'Maximum' max(" + Varname + makestring(i) + ") [Decimals=2], _0To19 '0 - 19' expression('" + Varname + makestring(i) + " >= 0 AND " + Varname + makestring(i) + " <= 19'), _20To39 '20 - 39' expression('" + Varname + makestring(i) + " >= 20 AND " + Varname + makestring(i) + " <= 39'), _40To59 '40 - 59' expression('" + Varname + makestring(i) + " >= 40 AND " + Varname + makestring(i) + " <= 59'), _60To79 '60 - 79' expression('" + Varname + makestring(i) + " >= 60 AND " + Varname + makestring(i) + " <= 79'), _80To100 '80 - 100' expression('" + Varname + makestring(i) + " >= 80 AND " + Varname + makestring(i) + " <= 100')}"
+            if i > 1 then ListVarsShare = ListVarsShare + " + " + VarName + makestring(i)+ "{base(), eMean 'Mean' mean(" + Varname + makestring(i) + ") [Decimals=2], eMinimum 'Minimum' min(" + Varname + makestring(i) + ") [Decimals=2], eMaximum 'Maximum' max(" + Varname + makestring(i) + ") [Decimals=2], _0To19 '0 - 19' expression('" + Varname + makestring(i) + " >= 0 AND " + Varname + makestring(i) + " <= 19'), _20To39 '20 - 39' expression('" + Varname + makestring(i) + " >= 20 AND " + Varname + makestring(i) + " <= 39'), _40To59 '40 - 59' expression('" + Varname + makestring(i) + " >= 40 AND " + Varname + makestring(i) + " <= 59'), _60To79 '60 - 79' expression('" + Varname + makestring(i) + " >= 60 AND " + Varname + makestring(i) + " <= 79'), _80To100 '80 - 100' expression('" + Varname + makestring(i) + " >= 80 AND " + Varname + makestring(i) + " <= 100')}"
+      next
+
+End Function
+
+Function RemCom (VarName)
+Dim i, sp,leng
+	RemCom = ""
+	sp = split(VarName,",")
+	leng = len(sp)
+	For i = 1 to leng
+		if i = 1 then RemCom = sp[i-1]
+		if i > 1 then RemCom = RemCom + " + " + sp[i-1]
+	next
+
+End Function
+
+Function RemComOv (VarName)
+Dim i, sp,leng
+	RemComOv = ""
+	sp = split(VarName,",")
+	leng = len(sp)
+	For i = 1 to leng
+		if i = 1 then RemComOv = sp[i-1] + "{Base('Overall=1'),..}"
+		if i > 1 then RemComOv = RemComOv + " + " + sp[i-1] + "{Base('Overall=1'),..}"
+	next
+
+End Function
+
+
+
+Function GetGridSort(QRE, C, Slice, SlNum)
+	if C = 0 then GetGridSort = "TerrGrid{Base} >" + QRE + "{" + Slice + makestring(SlNum) + "}"
+	if C > 0 then GetGridSort = QRE + "{" + Slice + makestring(SlNum) + "}"
+End Function	
